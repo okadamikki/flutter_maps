@@ -36,10 +36,10 @@ class MapView extends StatefulWidget {
 
 class _MapViewState extends State<MapView> {
   final CameraPosition _initialLocation =
-      const CameraPosition(target: LatLng(0.0, 0.0));
+      const CameraPosition(target: LatLng(10, 0.0));
   late GoogleMapController mapController;
 
-  late Position _currentPosition;
+  Position? _currentPosition;
   String _currentAddress = '';
 
   final startAddressController = TextEditingController();
@@ -135,7 +135,7 @@ class _MapViewState extends State<MapView> {
   _getAddress() async {
     try {
       List<Placemark> p = await placemarkFromCoordinates(
-          _currentPosition.latitude, _currentPosition.longitude);
+          _currentPosition?.latitude ?? 0, _currentPosition?.longitude ?? 0);
 
       Placemark place = p[0];
 
@@ -160,11 +160,11 @@ class _MapViewState extends State<MapView> {
 
       // Use the retrieved coordinates of the current position,
       double startLatitude = _startAddress == _currentAddress
-          ? _currentPosition.latitude
+          ? _currentPosition!.latitude
           : startPlacemark[0].latitude;
 
       double startLongitude = _startAddress == _currentAddress
-          ? _currentPosition.longitude
+          ? _currentPosition!.longitude
           : startPlacemark[0].longitude;
 
       double destinationLatitude = destinationPlacemark[0].latitude;
@@ -541,8 +541,10 @@ class _MapViewState extends State<MapView> {
                             CameraUpdate.newCameraPosition(
                               CameraPosition(
                                 target: LatLng(
-                                  _currentPosition.latitude,
-                                  _currentPosition.longitude,
+                                  _currentPosition?.latitude ??
+                                      _getCurrentLocation(),
+                                  _currentPosition?.longitude ??
+                                      _getCurrentLocation(),
                                 ),
                                 zoom: 18.0,
                               ),
